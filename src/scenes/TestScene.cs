@@ -4,6 +4,8 @@ using System.Numerics;
 namespace RTWeekend;
 
 class TestScene : IScene {
+  private Random random = new();
+
   public void Render(Vector3[,] image) {
     var width = image.GetLength(1);
     var height = image.GetLength(0);
@@ -17,8 +19,8 @@ class TestScene : IScene {
     world.Add(new Sphere(new Vector3(0.0f, 0.0f, -1.0f), 0.5f));
     world.Add(new Sphere(new Vector3(0.0f, -100.5f, -1.0f), 100.0f));
 
-    var random = new Random();
-    var sampleCount = 256;
+    var maxBounces = 50;
+    var sampleCount = 32;
     var sampleContribution = 1.0f / sampleCount;
 
     var progress = new Progress();
@@ -30,7 +32,7 @@ class TestScene : IScene {
           var u = (x + random.NextSingle()) / (width - 1);
           var v = (y + random.NextSingle()) / (height - 1);
           var ray = camera.GetRay(u, v);
-          color += sampleContribution * Color(world, ray);
+          color += sampleContribution * Color(world, ray, maxBounces);
         }
         image[y, x] = color;
       }
@@ -44,10 +46,15 @@ class TestScene : IScene {
     return Vector3.Lerp(new Vector3(1), new Vector3(0.5f, 0.7f, 1.0f), t);
   }
 
-  private static Vector3 Color(World world, Ray ray) {
+  private Vector3 Color(World world, Ray ray, int bounces) {
+    // If we've exceeded the ray bounce limit, no more light is gathered.
+    if (bounces <= 0) return Vector3.Zero;
+
     var rec = new HitRecord();
-    if (world.Hit(ray, new Range(0, float.MaxValue), ref rec)) {
-      return 0.5f * (rec.N + new Vector3(1.0f));
+    // @TODO: Appropriate offset for the range to avoid self-intersection.
+    if (world.Hit(ray, new Range(0.001f, float.MaxValue), ref rec)) {
+      var target = rec.P + rec.N + random.NextInUnitSphere();
+      return 0.5f * Color(world, new Ray(rec.P, target - rec.P), bounces - 1);
     }
 
     return BackgroundColor(ray);
