@@ -8,14 +8,9 @@ class TestScene : IScene {
     var height = image.GetLength(0);
 
     var aspectRatio = (float)width / height;
-    var viewportHeight = 2.0f;
-    var viewportWidth = aspectRatio * viewportHeight;
     var focalLength = 1.0f; // Distance between the eye and the projection plane.
 
-    var origin = Vector3.Zero;
-    var horizontal = new Vector3(viewportWidth, 0, 0);
-    var vertical = new Vector3(0, viewportHeight, 0);
-    var lowerLeftCorner = origin - 0.5f * horizontal - 0.5f * vertical - new Vector3(0, 0, focalLength);
+    var camera = new Camera(aspectRatio, focalLength);
 
     var world = new World();
     world.Add(new Sphere(new Vector3(0.0f, 0.0f, -1.0f), 0.5f));
@@ -26,8 +21,7 @@ class TestScene : IScene {
       for (int x = 0; x < width; ++x) {
         var u = (float)x / (width - 1);
         var v = (float)y / (height - 1);
-
-        var ray = new Ray(origin, lowerLeftCorner + u * horizontal + v * vertical - origin);
+        var ray = camera.GetRay(u, v);
         image[y, x] = Color(world, ray);
       }
       progress.Report(y + 1, height);
