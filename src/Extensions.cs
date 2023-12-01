@@ -28,3 +28,10 @@ public static class RandomExtensions {
     return Vector3.Dot(v, normal) > 0.0f ? v : -v;
   }
 }
+
+public static class Vector3Extensions {
+  const float epsilon = 1.0e-8f;
+
+  public static bool IsNearZero(this Vector3 v)
+    => MathF.Abs(v.X) < epsilon && MathF.Abs(v.Y) < epsilon && MathF.Abs(v.Z) < epsilon;
+}

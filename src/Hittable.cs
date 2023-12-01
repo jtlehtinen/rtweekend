@@ -10,6 +10,7 @@ public record struct Range(float Min, float Max) {
 }
 
 public struct HitRecord {
+  public IMaterial Material;
   public Vector3 P;
   public Vector3 N;
   public float T;
@@ -25,7 +26,7 @@ public interface IHittable {
   bool Hit(Ray ray, Range t, ref HitRecord rec);
 }
 
-public record Sphere(Vector3 Center, float Radius) : IHittable {
+public record Sphere(Vector3 Center, float Radius, IMaterial Material) : IHittable {
   public bool Hit(Ray ray, Range t, ref HitRecord rec) {
     Vector3 origin = ray.Origin - Center;
     float a = ray.Direction.LengthSquared();
@@ -48,6 +49,7 @@ public record Sphere(Vector3 Center, float Radius) : IHittable {
     rec.P = ray.At(root);
     var outwardNormal = (rec.P - Center) / Radius;
     rec.SetFaceNormal(ray, outwardNormal);
+    rec.Material = Material;
 
     return true;
   }

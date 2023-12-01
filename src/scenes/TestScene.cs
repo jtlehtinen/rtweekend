@@ -16,8 +16,15 @@ class TestScene : IScene {
     var camera = new Camera(aspectRatio, focalLength);
 
     var world = new World();
-    world.Add(new Sphere(new Vector3(0.0f, 0.0f, -1.0f), 0.5f));
-    world.Add(new Sphere(new Vector3(0.0f, -100.5f, -1.0f), 100.0f));
+    var groundMaterial = new Lambertian(new Vector3(0.8f, 0.8f, 0.0f));
+    var centerMaterial = new Lambertian(new Vector3(0.7f, 0.3f, 0.3f));
+    var leftMaterial = new Metal(new Vector3(0.8f));
+    var rightMaterial = new Metal(new Vector3(0.8f, 0.6f, 0.2f));
+
+    world.Add(new Sphere(new Vector3(0.0f, -100.5f, -1.0f), 100.0f, groundMaterial));
+    world.Add(new Sphere(new Vector3(0.0f, 0.0f, -1.0f), 0.5f, centerMaterial));
+    world.Add(new Sphere(new Vector3(-1.0f, 0.0f, -1.0f), 0.5f, leftMaterial));
+    world.Add(new Sphere(new Vector3(1.0f, 0.0f, -1.0f), 0.5f, rightMaterial));
 
     var maxBounces = 50;
     var sampleCount = 256;
@@ -53,10 +60,12 @@ class TestScene : IScene {
     var rec = new HitRecord();
     var selfIntersectionBias = 0.001f;
     if (world.Hit(ray, new Range(selfIntersectionBias, float.MaxValue), ref rec)) {
-      //var target = rec.P + rec.N + random.NextInUnitSphere();
-      //var target = rec.P + rec.N + random.NextUnitVector3();
-      var target = rec.P + random.NextInHemisphere(rec.N);
-      return 0.5f * Color(world, new Ray(rec.P, target - rec.P), bounces - 1);
+      Vector3 attenuation;
+      Ray scattered;
+      if (rec.Material.Scatter(random, ray, rec, out attenuation, out scattered)) {
+        return attenuation * Color(world, scattered, bounces - 1);
+      }
+      return Vector3.Zero;
     }
 
     return BackgroundColor(ray);
