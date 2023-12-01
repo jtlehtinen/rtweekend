@@ -47,10 +47,18 @@ public record Dielectric(float RefractiveIndex) : IMaterial {
     var refractiveIndexRatio = rec.FrontFaceHit ? 1.0f / RefractiveIndex : RefractiveIndex;
 
     var unitDirection = Vector3.Normalize(ray.Direction);
-    var normal = rec.N;
+    float cosTheta = Math.Min(Vector3.Dot(-unitDirection, rec.N), 1.0f);
+    float sinTheta = (float)Math.Sqrt(1.0f - cosTheta * cosTheta);
 
-    var refracted = Refract(unitDirection, normal, refractiveIndexRatio);
-    scattered = new Ray(rec.P, refracted);
+    bool mustReflect = refractiveIndexRatio * sinTheta > 1.0f;
+
+    if (mustReflect) {
+      var reflected = Vector3.Reflect(unitDirection, rec.N);
+      scattered = new Ray(rec.P, reflected);
+    } else {
+      var refracted = Refract(unitDirection, rec.N, refractiveIndexRatio);
+      scattered = new Ray(rec.P, refracted);
+    }
 
     return true;
   }
