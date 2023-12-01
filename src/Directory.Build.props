@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <BaseIntermediateOutputPath>$(ProjectDir)..\obj\RTWeekend\</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>$(ProjectDir)..\obj\RTWeekend\</MSBuildProjectExtensionsPath>
+  </PropertyGroup>
+</Project>
