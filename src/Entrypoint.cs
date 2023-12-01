@@ -26,15 +26,15 @@ public class Entrypoint {
   }
 
   public static void Main() {
-    int width = 1200;
-    int height = 800;
+    int width = 400;
+    int height = 300;
     var image = new Vector3[height, width];
 
     //var scene = new GradientScene();
     //var scene = new SkyGradientScene();
     //var scene = new NonShadedSphereScene();
     //var scene = new NormalShadedSphereScene();
-    var scene = new TestScene();
+    var scene = new TestScene(true);
 
     var watch = new Stopwatch();
     watch.Start();

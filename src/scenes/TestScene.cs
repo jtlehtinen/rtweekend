@@ -1,12 +1,42 @@
 using System;
 using System.Numerics;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace RTWeekend;
 
 class TestScene : IScene {
-  private readonly Random random = new();
+  private readonly bool parallel;
 
-  private World CreateWorld() {
+  public TestScene(bool parallel = false) {
+    this.parallel = parallel;
+  }
+
+  private void TraceRow(Vector3[,] image, World world, Camera camera, Random random, int y) {
+    var bounces = 50;
+    var sampleCount = 500;
+    var sampleContribution = 1.0f / sampleCount;
+
+    var width = image.GetLength(1);
+    var height = image.GetLength(0);
+
+    for (int x = 0; x < width; ++x) {
+      var color = Vector3.Zero;
+
+      for (int sampleIndex = 0; sampleIndex < sampleCount; ++sampleIndex) {
+        var u = (x + random.NextSingle()) / (width - 1);
+        var v = (y + random.NextSingle()) / (height - 1);
+
+        var ray = camera.GetRay(random, u, v);
+        color += sampleContribution * Color(random, world, ray, bounces);
+      }
+      image[y, x] = color;
+    }
+  }
+
+  private static readonly ThreadLocal<Random> ThreadRandom = new(() => new Random());
+
+  private World CreateWorld(Random random) {
     var result = new World();
 
     result.Add(new Sphere(new Vector3(0.0f, -1000.0f, 0.0f), 1000.0f, new Lambertian(new Vector3(0.5f))));
@@ -61,26 +91,27 @@ class TestScene : IScene {
       focusDistance
     );
 
-    var world = CreateWorld();
-
-    var maxBounces = 50;
-    var sampleCount = 32;
-    var sampleContribution = 1.0f / sampleCount;
+    var world = CreateWorld(ThreadRandom.Value!);
 
     var progress = new Progress();
-    for (int y = 0; y < height; ++y) {
-      for (int x = 0; x < width; ++x) {
-        var color = Vector3.Zero;
-
-        for (int sampleIndex = 0; sampleIndex < sampleCount; ++sampleIndex) {
-          var u = (x + random.NextSingle()) / (width - 1);
-          var v = (y + random.NextSingle()) / (height - 1);
-          var ray = camera.GetRay(random, u, v);
-          color += sampleContribution * Color(world, ray, maxBounces);
+    if (parallel) {
+      var rowsDone = 0;
+      Parallel.For(
+        0,
+        height,
+        (row) => {
+          TraceRow(image, world, camera, ThreadRandom.Value!, row);
+          var result = Interlocked.Increment(ref rowsDone);
+          lock (progress) {
+            progress.Report(result, height);
+          }
         }
-        image[y, x] = color;
+      );
+    } else {
+      for (int y = 0; y < height; ++y) {
+        TraceRow(image, world, camera, ThreadRandom.Value!, y);
+        progress.Report(y + 1, height);
       }
-      progress.Report(y + 1, height);
     }
   }
 
@@ -90,7 +121,7 @@ class TestScene : IScene {
     return Vector3.Lerp(new Vector3(1), new Vector3(0.5f, 0.7f, 1.0f), t);
   }
 
-  private Vector3 Color(World world, Ray ray, int bounces) {
+  private Vector3 Color(Random random, World world, Ray ray, int bounces) {
     // If we've exceeded the ray bounce limit, no more light is gathered.
     if (bounces <= 0) return Vector3.Zero;
 
@@ -100,7 +131,7 @@ class TestScene : IScene {
       Vector3 attenuation;
       Ray scattered;
       if (rec.Material.Scatter(random, ray, rec, out attenuation, out scattered)) {
-        return attenuation * Color(world, scattered, bounces - 1);
+        return attenuation * Color(random, world, scattered, bounces - 1);
       }
       return Vector3.Zero;
     }
