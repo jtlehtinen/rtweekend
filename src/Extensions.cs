@@ -35,3 +35,8 @@ public static class Vector3Extensions {
   public static bool IsNearZero(this Vector3 v)
     => MathF.Abs(v.X) < epsilon && MathF.Abs(v.Y) < epsilon && MathF.Abs(v.Z) < epsilon;
 }
+
+public static class FloatExtensions {
+  public static float Pow2(this float x) => x * x;
+  public static float Pow5(this float x) => x * x * x * x * x;
+}

@@ -24,6 +24,7 @@ class TestScene : IScene {
     world.Add(new Sphere(new Vector3(0.0f, -100.5f, -1.0f), 100.0f, groundMaterial));
     world.Add(new Sphere(new Vector3(0.0f, 0.0f, -1.0f), 0.5f, centerMaterial));
     world.Add(new Sphere(new Vector3(-1.0f, 0.0f, -1.0f), 0.5f, leftMaterial));
+    world.Add(new Sphere(new Vector3(-1.0f, 0.0f, -1.0f), -0.4f, leftMaterial));
     world.Add(new Sphere(new Vector3(1.0f, 0.0f, -1.0f), 0.5f, rightMaterial));
 
     var maxBounces = 50;

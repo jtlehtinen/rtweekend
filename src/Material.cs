@@ -39,6 +39,12 @@ public record Dielectric(float RefractiveIndex) : IMaterial {
     return outPerp + outParallel;
   }
 
+  private static float Reflectance(float cosine, float refractiveIndexRatio) {
+    // Use Schlick's approximation for reflectance.
+    var r0 = ((1.0f - refractiveIndexRatio) / (1.0f + refractiveIndexRatio)).Pow2();
+    return r0 + (1.0f - r0) * (1.0f - cosine).Pow5();
+  }
+
   public bool Scatter(Random random, Ray ray, HitRecord rec, out Vector3 attenuation, out Ray scattered) {
     attenuation = Vector3.One;
 
@@ -52,7 +58,7 @@ public record Dielectric(float RefractiveIndex) : IMaterial {
 
     bool mustReflect = refractiveIndexRatio * sinTheta > 1.0f;
 
-    if (mustReflect) {
+    if (mustReflect || (Reflectance(cosTheta, refractiveIndexRatio) > random.NextSingle())) {
       var reflected = Vector3.Reflect(unitDirection, rec.N);
       scattered = new Ray(rec.P, reflected);
     } else {
