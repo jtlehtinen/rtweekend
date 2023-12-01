@@ -4,7 +4,43 @@ using System.Numerics;
 namespace RTWeekend;
 
 class TestScene : IScene {
-  private Random random = new();
+  private readonly Random random = new();
+
+  private World CreateWorld() {
+    var result = new World();
+
+    result.Add(new Sphere(new Vector3(0.0f, -1000.0f, 0.0f), 1000.0f, new Lambertian(new Vector3(0.5f))));
+
+    for (int a = -11; a < 11; ++a) {
+      for (int b = -11; b < 11; ++b) {
+        var chooseMaterial = random.NextSingle();
+        var center = new Vector3(a + 0.9f * random.NextSingle(), 0.2f, b + 0.9f * random.NextSingle());
+
+        if ((center - new Vector3(4.0f, 0.2f, 0.0f)).Length() > 0.9f) {
+          if (chooseMaterial < 0.8f) { // diffuse
+            var x = random.NextSingle() * random.NextSingle();
+            var y = random.NextSingle() * random.NextSingle();
+            var z = random.NextSingle() * random.NextSingle();
+            result.Add(new Sphere(center, 0.2f, new Lambertian(new Vector3(x, y, z))));
+          } else if (chooseMaterial < 0.95f) { // metal
+            var x = random.NextSingle() * 0.5f + 0.5f;
+            var y = random.NextSingle() * 0.5f + 0.5f;
+            var z = random.NextSingle() * 0.5f + 0.5f;
+            var fuzz = random.NextSingle() * 0.5f;
+            result.Add(new Sphere(center, 0.2f, new Metal(new Vector3(x, y, z), fuzz)));
+          } else { // glass
+            result.Add(new Sphere(center, 0.2f, new Dielectric(1.5f)));
+          }
+        }
+      }
+    }
+
+    result.Add(new Sphere(new Vector3(0.0f, 1.0f, 0.0f), 1.0f, new Dielectric(1.5f)));
+    result.Add(new Sphere(new Vector3(-4.0f, 1.0f, 0.0f), 1.0f, new Lambertian(new Vector3(0.4f, 0.2f, 0.1f))));
+    result.Add(new Sphere(new Vector3(4.0f, 1.0f, 0.0f), 1.0f, new Metal(new Vector3(0.7f, 0.6f, 0.5f), 0.0f)));
+
+    return result;
+  }
 
   public void Render(Vector3[,] image) {
     var width = image.GetLength(1);
@@ -12,33 +48,23 @@ class TestScene : IScene {
 
     var aspectRatio = (float)width / height;
 
-    var eye = new Vector3(3.0f, 3.0f, 2.0f);
-    var target = new Vector3(0.0f, 0.0f, -1.0f);
-    var focusDistance = (target - eye).Length();
+    var eye = new Vector3(13.0f, 2.0f, 3.0f);
+    var target = new Vector3(0.0f);
+    var focusDistance = 10.0f;
     var camera = new Camera(
       eye,
       target,
       new Vector3(0.0f, 1.0f, 0.0f),
       20.0f,
       aspectRatio,
-      2.0f,
+      0.1f,
       focusDistance
     );
 
-    var world = new World();
-    var groundMaterial = new Lambertian(new Vector3(0.8f, 0.8f, 0.0f));
-    var centerMaterial = new Lambertian(new Vector3(0.1f, 0.2f, 0.5f));
-    var leftMaterial = new Dielectric(1.5f);
-    var rightMaterial = new Metal(new Vector3(0.8f, 0.6f, 0.2f));
-
-    world.Add(new Sphere(new Vector3(0.0f, -100.5f, -1.0f), 100.0f, groundMaterial));
-    world.Add(new Sphere(new Vector3(0.0f, 0.0f, -1.0f), 0.5f, centerMaterial));
-    world.Add(new Sphere(new Vector3(-1.0f, 0.0f, -1.0f), 0.5f, leftMaterial));
-    world.Add(new Sphere(new Vector3(-1.0f, 0.0f, -1.0f), -0.4f, leftMaterial));
-    world.Add(new Sphere(new Vector3(1.0f, 0.0f, -1.0f), 0.5f, rightMaterial));
+    var world = CreateWorld();
 
     var maxBounces = 50;
-    var sampleCount = 256;
+    var sampleCount = 32;
     var sampleContribution = 1.0f / sampleCount;
 
     var progress = new Progress();

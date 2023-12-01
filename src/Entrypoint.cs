@@ -26,8 +26,8 @@ public class Entrypoint {
   }
 
   public static void Main() {
-    int width = 256;
-    int height = 256;
+    int width = 1200;
+    int height = 800;
     var image = new Vector3[height, width];
 
     //var scene = new GradientScene();
