@@ -51,8 +51,8 @@ class TestScene : IScene {
     if (bounces <= 0) return Vector3.Zero;
 
     var rec = new HitRecord();
-    // @TODO: Appropriate offset for the range to avoid self-intersection.
-    if (world.Hit(ray, new Range(0.001f, float.MaxValue), ref rec)) {
+    var selfIntersectionBias = 0.001f;
+    if (world.Hit(ray, new Range(selfIntersectionBias, float.MaxValue), ref rec)) {
       var target = rec.P + rec.N + random.NextInUnitSphere();
       return 0.5f * Color(world, new Ray(rec.P, target - rec.P), bounces - 1);
     }

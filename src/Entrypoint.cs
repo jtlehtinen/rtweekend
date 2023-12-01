@@ -9,6 +9,22 @@ interface IScene {
 }
 
 public class Entrypoint {
+  /// <summary>
+  /// Cheap approximation of gamma correction.
+  /// </summary>
+  private static void GammaCorrect(Vector3[,] image) {
+    int height = image.GetLength(0);
+    int width = image.GetLength(1);
+
+    for (int y = 0; y < height; ++y) {
+      for (int x = 0; x < width; ++x) {
+        image[y, x].X = MathF.Sqrt(image[y, x].X);
+        image[y, x].Y = MathF.Sqrt(image[y, x].Y);
+        image[y, x].Z = MathF.Sqrt(image[y, x].Z);
+      }
+    }
+  }
+
   public static void Main() {
     int width = 256;
     int height = 256;
@@ -27,6 +43,8 @@ public class Entrypoint {
 
     watch.Stop();
     Console.WriteLine($"\nrender time: {watch.Elapsed}");
+
+    GammaCorrect(image);
 
     PPM.Write("out.ppm", image);
   }
