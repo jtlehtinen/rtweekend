@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 
 namespace RTWeekend;
@@ -16,13 +17,22 @@ class TestScene : IScene {
     world.Add(new Sphere(new Vector3(0.0f, 0.0f, -1.0f), 0.5f));
     world.Add(new Sphere(new Vector3(0.0f, -100.5f, -1.0f), 100.0f));
 
+    var random = new Random();
+    var sampleCount = 256;
+    var sampleContribution = 1.0f / sampleCount;
+
     var progress = new Progress();
     for (int y = 0; y < height; ++y) {
       for (int x = 0; x < width; ++x) {
-        var u = (float)x / (width - 1);
-        var v = (float)y / (height - 1);
-        var ray = camera.GetRay(u, v);
-        image[y, x] = Color(world, ray);
+        var color = Vector3.Zero;
+
+        for (int sampleIndex = 0; sampleIndex < sampleCount; ++sampleIndex) {
+          var u = (x + random.NextSingle()) / (width - 1);
+          var v = (y + random.NextSingle()) / (height - 1);
+          var ray = camera.GetRay(u, v);
+          color += sampleContribution * Color(world, ray);
+        }
+        image[y, x] = color;
       }
       progress.Report(y + 1, height);
     }
