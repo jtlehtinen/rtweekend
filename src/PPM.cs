@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Numerics;
 using System.Text;
@@ -18,9 +19,9 @@ public static class PPM {
     stream.Write($"P3\n{width} {height}\n255\n");
     for (int y = height - 1; y >= 0; --y) {
       for (int x = 0; x < width; ++x) {
-        int r = (int)(255.99f * image[y, x].X);
-        int g = (int)(255.99f * image[y, x].Y);
-        int b = (int)(255.99f * image[y, x].Z);
+        int r = Math.Clamp((int)(255.99f * image[y, x].X), 0, 255);
+        int g = Math.Clamp((int)(255.99f * image[y, x].Y), 0, 255);
+        int b = Math.Clamp((int)(255.99f * image[y, x].Z), 0, 255);
         stream.Write($"{r} {g} {b}\n");
       }
     }
