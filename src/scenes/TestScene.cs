@@ -17,8 +17,8 @@ class TestScene : IScene {
 
     var world = new World();
     var groundMaterial = new Lambertian(new Vector3(0.8f, 0.8f, 0.0f));
-    var centerMaterial = new Lambertian(new Vector3(0.7f, 0.3f, 0.3f));
-    var leftMaterial = new Metal(new Vector3(0.8f), 0.3f);
+    var centerMaterial = new Dielectric(1.5f);
+    var leftMaterial = new Dielectric(1.5f);
     var rightMaterial = new Metal(new Vector3(0.8f, 0.6f, 0.2f), 1.0f);
 
     world.Add(new Sphere(new Vector3(0.0f, -100.5f, -1.0f), 100.0f, groundMaterial));
