@@ -12,8 +12,9 @@ public class Entrypoint {
     int height = 256;
     var image = new Vector3[height, width];
 
-    //var scene = new Gradient();
-    var scene = new SkyGradient();
+    //var scene = new GradientScene();
+    //var scene = new SkyGradientScene();
+    var scene = new NonShadedSphereScene();
     scene.Render(image);
 
     PPM.Write("out.ppm", image);

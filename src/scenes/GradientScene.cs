@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace RTWeekend;
 
-class Gradient : IScene {
+class GradientScene : IScene {
   public void Render(Vector3[,] image) {
     var width = image.GetLength(1);
     var height = image.GetLength(0);

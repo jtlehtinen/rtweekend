@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace RTWeekend;
 
-class SkyGradient : IScene {
+class NonShadedSphereScene : IScene {
   public void Render(Vector3[,] image) {
     var imageWidth = image.GetLength(1);
     var imageHeight = image.GetLength(0);
@@ -30,7 +30,21 @@ class SkyGradient : IScene {
     }
   }
 
+  private static bool HitSphere(Ray ray, Vector3 center, float radius) {
+    Vector3 origin = ray.Origin - center;
+    float a = Vector3.Dot(ray.Direction, ray.Direction);
+    float b = 2.0f * Vector3.Dot(origin, ray.Direction);
+    float c = Vector3.Dot(origin, origin) - radius * radius;
+    float discriminant = b * b - 4.0f * a * c;
+    return discriminant > 0;
+  }
+
   private static Vector3 Color(Ray ray) {
+    bool hit = HitSphere(ray, new Vector3(0, 0, -1), 0.5f);
+    return hit ? new Vector3(1, 0, 0) : BackgroundColor(ray);
+  }
+
+  private static Vector3 BackgroundColor(Ray ray) {
     var dir = Vector3.Normalize(ray.Direction);
     var t = 0.5f * dir.Y + 0.5f;
     return Vector3.Lerp(new Vector3(1), new Vector3(0.5f, 0.7f, 1.0f), t);
