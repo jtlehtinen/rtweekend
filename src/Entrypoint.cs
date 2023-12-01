@@ -14,7 +14,8 @@ public class Entrypoint {
 
     //var scene = new GradientScene();
     //var scene = new SkyGradientScene();
-    var scene = new NonShadedSphereScene();
+    //var scene = new NonShadedSphereScene();
+    var scene = new NormalShadedSphereScene();
     scene.Render(image);
 
     PPM.Write("out.ppm", image);
