@@ -22,11 +22,7 @@ public struct HitRecord {
   }
 }
 
-public interface IHittable {
-  bool Hit(Ray ray, Range t, ref HitRecord rec);
-}
-
-public record Sphere(Vector3 Center, float Radius, IMaterial Material) : IHittable {
+public record Sphere(Vector3 Center, float Radius, IMaterial Material) {
   public bool Hit(Ray ray, Range t, ref HitRecord rec) {
     Vector3 origin = ray.Origin - Center;
     float a = ray.Direction.LengthSquared();
@@ -55,21 +51,21 @@ public record Sphere(Vector3 Center, float Radius, IMaterial Material) : IHittab
   }
 }
 
-public class World : IHittable {
-  private readonly List<IHittable> hittables = new();
+public class World {
+  private readonly List<Sphere> spheres = new();
 
-  public void Add(IHittable hittable)
-    => hittables.Add(hittable);
+  public void Add(Sphere sphere)
+    => spheres.Add(sphere);
 
   public void Clear()
-    => hittables.Clear();
+    => spheres.Clear();
 
   public bool Hit(Ray ray, Range t, ref HitRecord outRec) {
     var rec = new HitRecord();
     var hit = false;
 
-    foreach (var hittable in hittables) {
-      if (hittable.Hit(ray, t, ref rec)) {
+    foreach (var sphere in spheres) {
+      if (sphere.Hit(ray, t, ref rec)) {
         t.Max = rec.T;
         hit = true;
       }

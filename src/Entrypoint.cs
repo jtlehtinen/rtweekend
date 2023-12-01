@@ -34,7 +34,7 @@ public class Entrypoint {
     //var scene = new SkyGradientScene();
     //var scene = new NonShadedSphereScene();
     //var scene = new NormalShadedSphereScene();
-    var scene = new TestScene(true);
+    var scene = new TestScene(false);
 
     var watch = new Stopwatch();
     watch.Start();

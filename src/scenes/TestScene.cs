@@ -14,7 +14,7 @@ class TestScene : IScene {
 
   private void TraceRow(Vector3[,] image, World world, Camera camera, Random random, int y) {
     var bounces = 50;
-    var sampleCount = 500;
+    var sampleCount = 16;
     var sampleContribution = 1.0f / sampleCount;
 
     var width = image.GetLength(1);
