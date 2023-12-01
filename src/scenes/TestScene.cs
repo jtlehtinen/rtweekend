@@ -18,8 +18,8 @@ class TestScene : IScene {
     var world = new World();
     var groundMaterial = new Lambertian(new Vector3(0.8f, 0.8f, 0.0f));
     var centerMaterial = new Lambertian(new Vector3(0.7f, 0.3f, 0.3f));
-    var leftMaterial = new Metal(new Vector3(0.8f));
-    var rightMaterial = new Metal(new Vector3(0.8f, 0.6f, 0.2f));
+    var leftMaterial = new Metal(new Vector3(0.8f), 0.3f);
+    var rightMaterial = new Metal(new Vector3(0.8f, 0.6f, 0.2f), 1.0f);
 
     world.Add(new Sphere(new Vector3(0.0f, -100.5f, -1.0f), 100.0f, groundMaterial));
     world.Add(new Sphere(new Vector3(0.0f, 0.0f, -1.0f), 0.5f, centerMaterial));
