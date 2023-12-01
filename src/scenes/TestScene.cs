@@ -20,7 +20,7 @@ class TestScene : IScene {
     world.Add(new Sphere(new Vector3(0.0f, -100.5f, -1.0f), 100.0f));
 
     var maxBounces = 50;
-    var sampleCount = 32;
+    var sampleCount = 256;
     var sampleContribution = 1.0f / sampleCount;
 
     var progress = new Progress();
@@ -53,7 +53,9 @@ class TestScene : IScene {
     var rec = new HitRecord();
     var selfIntersectionBias = 0.001f;
     if (world.Hit(ray, new Range(selfIntersectionBias, float.MaxValue), ref rec)) {
-      var target = rec.P + rec.N + random.NextInUnitSphere();
+      //var target = rec.P + rec.N + random.NextInUnitSphere();
+      //var target = rec.P + rec.N + random.NextUnitVector3();
+      var target = rec.P + random.NextInHemisphere(rec.N);
       return 0.5f * Color(world, new Ray(rec.P, target - rec.P), bounces - 1);
     }
 
