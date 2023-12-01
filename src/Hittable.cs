@@ -4,7 +4,10 @@ using System.Numerics;
 
 namespace RTWeekend;
 
-public record struct Range(float Min, float Max);
+public record struct Range(float Min, float Max) {
+  public readonly bool Contains(float x) => Min <= x && x <= Max;
+  public readonly bool Surrounds(float x) => Min < x && x < Max;
+}
 
 public struct HitRecord {
   public Vector3 P;
@@ -35,9 +38,10 @@ public record Sphere(Vector3 Center, float Radius) : IHittable {
 
     // Find the nearest root that lies in the acceptable range.
     float root = (-halfB - sqrtd) / a;
-    if (root < t.Min || root > t.Max) {
+    if (!t.Surrounds(root)) {
       root = (-halfB + sqrtd) / a;
-      if (root < t.Min || root > t.Max) return false;
+      if (!t.Surrounds(root))
+        return false;
     }
 
     rec.T = root;
