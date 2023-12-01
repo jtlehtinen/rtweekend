@@ -27,6 +27,13 @@ public static class RandomExtensions {
     var v = random.NextUnitVector3();
     return Vector3.Dot(v, normal) > 0.0f ? v : -v;
   }
+
+  public static Vector3 NextInUnitDisk(this Random random) {
+    for (;;) {
+      var v = 2.0f * new Vector3(random.NextSingle(), random.NextSingle(), 0) - new Vector3(1, 1, 0);
+      if (v.LengthSquared() < 1.0f) return v;
+    }
+  }
 }
 
 public static class Vector3Extensions {

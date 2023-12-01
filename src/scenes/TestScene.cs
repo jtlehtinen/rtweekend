@@ -11,12 +11,18 @@ class TestScene : IScene {
     var height = image.GetLength(0);
 
     var aspectRatio = (float)width / height;
+
+    var eye = new Vector3(3.0f, 3.0f, 2.0f);
+    var target = new Vector3(0.0f, 0.0f, -1.0f);
+    var focusDistance = (target - eye).Length();
     var camera = new Camera(
-      new Vector3(-2.0f, 2.0f, 1.0f),
-      new Vector3(0.0f, 0.0f, -1.0f),
+      eye,
+      target,
       new Vector3(0.0f, 1.0f, 0.0f),
       20.0f,
-      aspectRatio
+      aspectRatio,
+      2.0f,
+      focusDistance
     );
 
     var world = new World();
@@ -43,7 +49,7 @@ class TestScene : IScene {
         for (int sampleIndex = 0; sampleIndex < sampleCount; ++sampleIndex) {
           var u = (x + random.NextSingle()) / (width - 1);
           var v = (y + random.NextSingle()) / (height - 1);
-          var ray = camera.GetRay(u, v);
+          var ray = camera.GetRay(random, u, v);
           color += sampleContribution * Color(world, ray, maxBounces);
         }
         image[y, x] = color;
