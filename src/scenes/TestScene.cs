@@ -11,9 +11,13 @@ class TestScene : IScene {
     var height = image.GetLength(0);
 
     var aspectRatio = (float)width / height;
-    var focalLength = 1.0f; // Distance between the eye and the projection plane.
-
-    var camera = new Camera(aspectRatio, focalLength);
+    var camera = new Camera(
+      new Vector3(-2.0f, 2.0f, 1.0f),
+      new Vector3(0.0f, 0.0f, -1.0f),
+      new Vector3(0.0f, 1.0f, 0.0f),
+      20.0f,
+      aspectRatio
+    );
 
     var world = new World();
     var groundMaterial = new Lambertian(new Vector3(0.8f, 0.8f, 0.0f));
