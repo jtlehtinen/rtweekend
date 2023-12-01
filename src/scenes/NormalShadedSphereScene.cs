@@ -33,11 +33,19 @@ class NormalShadedSphereScene : IScene {
 
   private static float HitSphere(Ray ray, Vector3 center, float radius) {
     Vector3 origin = ray.Origin - center;
+#if false
     float a = Vector3.Dot(ray.Direction, ray.Direction);
     float b = 2.0f * Vector3.Dot(origin, ray.Direction);
     float c = Vector3.Dot(origin, origin) - radius * radius;
     float discriminant = b * b - 4.0f * a * c;
     return discriminant < 0.0f ? -1.0f : (-b - MathF.Sqrt(discriminant)) / (2.0f * a);
+#else
+    float a = ray.Direction.LengthSquared();
+    float halfB = Vector3.Dot(origin, ray.Direction);
+    float c = origin.LengthSquared() - radius * radius;
+    float discriminant = halfB * halfB - a * c;
+    return discriminant < 0.0f ? -1.0f : (-halfB - MathF.Sqrt(discriminant)) / a;
+#endif
   }
 
   private static Vector3 Color(Ray ray) {
