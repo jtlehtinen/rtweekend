@@ -36,7 +36,7 @@ class TestScene : IScene {
 
   private static readonly ThreadLocal<Random> ThreadRandom = new(() => new Random());
 
-  private World CreateWorld(Random random) {
+  private static World CreateWorld(Random random) {
     var result = new World();
 
     result.Add(new Sphere(new Vector3(0.0f, -1000.0f, 0.0f), 1000.0f, new Lambertian(new Vector3(0.5f))));
